@@ -2,6 +2,18 @@ import { PredictionServiceClient } from '@google-cloud/automl/build/src/v1';
 import { InterceptedFile } from './detection/models/InterceptedFile.model';
 import { readFileSync, writeFileSync } from 'fs';
 
+export interface PredictionResponse {
+  annotationSpecId: string
+  displayName: string
+  imageObjectDetection: {
+    boundingBox: {
+      normalizedVertices: Array<{
+        x: number,
+        y: number
+      }>
+    }
+  }
+}
 
 export class ObjectLocalization {
   private client
@@ -13,7 +25,7 @@ export class ObjectLocalization {
     return readFileSync(filePath)
   }
 
-  async predict(filePath: string) {
+  async predict(filePath: string): Promise<PredictionResponse[]> {
     const buffer = this.readImage(filePath)
     const request = {
       name: this.client.modelPath(
@@ -28,7 +40,8 @@ export class ObjectLocalization {
       },
     };
     const [response] = await this.client.predict(request);
-    console.log('Response Received', response.payload);
-    return response.payload;
+    const prediction: PredictionResponse[] = response.payload
+    console.log('Response Received', prediction);
+    return prediction;
   }
 }
