@@ -52,6 +52,28 @@ const setupStepsCosco = (imagePath: string) => [
     params: ['button:has-text("OK")'],
   },
   {
+    action: 'click',
+    params: ['text=Bill Of Lading'],
+  },
+  {
+    action: 'click',
+    params: ['text=Booking'],
+  },
+  {
+    action: 'screenshot',
+    params: [{ path: imagePath }],
+  },
+];
+const setupStepsWolt = (imagePath: string) => [
+  {
+    action: 'goto',
+    params: ['https://wolt.com/en/deu/berlin'],
+  },
+  {
+    action: 'click',
+    params: ['button:has-text("Accept")'],
+  },
+  {
     action: 'screenshot',
     params: [{ path: imagePath }],
   },
@@ -201,15 +223,11 @@ const run = async (setupSteps, typeInSearch, finalSteps) => {
 };
 
 const main = async () => {
-  await run(
-    setupGenericSteps('https://duckduckgo.com/'),
-    'anon search',
-    finalSteps,
-  );
-  await run(setupStepsCosco, 'COSU6293350130', finalSteps);
+  await run(setupGenericSteps('https://duckduckgo.com/'), 'anon search', finalSteps);
   const oneyBlNo = 'NK0GF9561700';
   await run(setupStepsOney, oneyBlNo, finalSteps);
   await run(setupStepsOther, 'a search term', finalSteps);
+  await run(setupStepsCosco, '6293350130', finalSteps);
 };
 
 main();
