@@ -157,7 +157,7 @@ const run = async (setupSteps, typeInSearch, finalSteps) => {
         ([document, step]) => {
           const el = document.createElement('div');
           const { top, left, width, height } = step.params;
-          el.style = `width:${width};height:${height};top:${top};left:${left};border:3px solid #d62828;position:fixed;pointer-events:none;`;
+          el.style = `width:${width};height:${height};top:${top};left:${left};border:3px solid #283618;background:rgba(96, 108, 56,0.3);position:fixed;pointer-events:none;`;
           document.body.appendChild(el);
           return el;
         },
@@ -185,7 +185,6 @@ const main = async () => {
   const oneyBlNo = 'NK0GF9561700';
   await run(setupStepsOney, oneyBlNo, finalSteps);
   await run(setupStepsOther, 'a search term', finalSteps);
-}
+};
 
-main()
-
+main();
