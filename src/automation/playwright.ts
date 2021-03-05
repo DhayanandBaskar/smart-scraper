@@ -105,13 +105,13 @@ const generateInputSteps = (coordinates, text) => {
   return result;
 };
 const generateSearchButtonSteps = coordinates => {
-  if(!coordinates) {
+  if (!coordinates) {
     return [
       {
-        action: "keyboard.press",
-        params: ["Enter"]
-      }
-    ]
+        action: 'keyboard.press',
+        params: ['Enter'],
+      },
+    ];
   }
   const coords = convertVecToPx(coordinates);
   return [
@@ -177,7 +177,7 @@ const run = async (setupSteps, typeInSearch, finalSteps) => {
         ([document, step]) => {
           const el = document.createElement('div');
           const { top, left, width, height } = step.params;
-          el.style = `width:${width};height:${height};top:${top};left:${left};border:3px solid #283618;background:rgba(96, 108, 56,0.3);position:fixed;pointer-events:none;`;
+          el.style = `width:${width};height:${height};top:${top};left:${left};border:3px solid #283618;background:rgba(96, 108, 56,0.3);position:fixed;pointer-events:none;z-index:999999;`;
           document.body.appendChild(el);
           return el;
         },
@@ -201,7 +201,11 @@ const run = async (setupSteps, typeInSearch, finalSteps) => {
 };
 
 const main = async () => {
-  await run(setupGenericSteps('https://duckduckgo.com/'), 'anon search', finalSteps);
+  await run(
+    setupGenericSteps('https://duckduckgo.com/'),
+    'anon search',
+    finalSteps,
+  );
   await run(setupStepsCosco, 'COSU6293350130', finalSteps);
   const oneyBlNo = 'NK0GF9561700';
   await run(setupStepsOney, oneyBlNo, finalSteps);
