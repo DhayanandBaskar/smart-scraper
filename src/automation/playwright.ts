@@ -113,10 +113,10 @@ const generateSearchButtonSteps = coordinates => {
   ];
 };
 const finalSteps = [
-  {
-    action: 'pause',
-    params: [],
-  },
+  // {
+  //   action: 'pause',
+  //   params: [],
+  // },
 ];
 const run = async (setupSteps, typeInSearch, finalSteps) => {
   const objectLocalizer = new ObjectLocalization();
@@ -146,7 +146,7 @@ const run = async (setupSteps, typeInSearch, finalSteps) => {
   const buttonSteps = generateSearchButtonSteps(
     searchButton.imageObjectDetection.boundingBox.normalizedVertices,
   );
-  const steps = [...inputSteps, ...buttonSteps, finalSteps];
+  const steps = [...inputSteps, ...buttonSteps, ...finalSteps];
 
   for await (const step of steps) {
     console.log(step);
@@ -181,7 +181,7 @@ const run = async (setupSteps, typeInSearch, finalSteps) => {
 };
 
 const main = async () => {
-  // run(setupStepsCosco, 'cosco', finalSteps);
+  await run(setupStepsCosco, 'cosco', finalSteps);
   const oneyBlNo = 'NK0GF9561700';
   await run(setupStepsOney, oneyBlNo, finalSteps);
   await run(setupStepsOther, 'a search term', finalSteps);
