@@ -21,6 +21,9 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@types/lodash": "^4.14.168",
+    "lodash": "^4.17.21",
+    "playwright": "^1.9.1",
     "@google-cloud/automl": "^2.2.0",
     "@google-cloud/vision": "^2.1.1",
     "@nestjs/common": "^7.0.0",
