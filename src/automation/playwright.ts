@@ -3,7 +3,8 @@ import { ObjectLocalization } from '../ObjectLocalization';
 const { chromium } = require('playwright');
 const _ = require('lodash');
 const uuid = require('uuid');
-
+const viewportWidth = 1440;
+const viewportHeight = 785;
 
 const setupStepsOther = (imagePath: string) => [
   {
@@ -43,34 +44,46 @@ const setupStepsCosco = (imagePath: string) => [
     params: [{ path: imagePath }],
   },
 ];
-const convertVecToPx = coordinates => {
-  const top = coordinates[0];
-  const left = coordinates[1];
-  const width = coordinates[2];
-  const height = coordinates[3];
-
+const convertVecToPx = normalizedVertices => {
+  const top = normalizedVertices[0].y * viewportHeight;
+  const left = normalizedVertices[0].x * viewportWidth;
+  const width =
+    normalizedVertices[1].x * viewportWidth -
+    normalizedVertices[0].x * viewportWidth;
+  const height =
+    normalizedVertices[1].x * viewportHeight -
+    normalizedVertices[0].x * viewportHeight;
+  const centroid = {
+    x: left + width / 2,
+    y: top + height / 2,
+  };
   return {
     top: `${top}px`,
     left: `${left}px`,
     width: `${width}px`,
     height: `${height}px`,
+    centroid,
   };
 };
 // label: 'search_input_box',
 const generateInputSteps = (coordinates, text) => {
+  const coords = convertVecToPx(coordinates);
+
   const result = [
     {
       action: 'showBoundingBox',
-      params: {
-        top: '259px',
-        left: '416px',
-        width: '160px',
-        height: '30px',
-      },
+      //   params: {
+      //     top: '259px',
+      //     left: '416px',
+      //     width: '160px',
+      //     height: '30px',
+      //   },
+      params: coords,
     },
     {
       action: 'mouse.click',
-      params: [416 + 10, 259 + 5],
+      //   params: [416 + 10, 259 + 5],
+      params: [coords.centroid.x, coords.centroid.y],
     },
     {
       action: 'keyboard.insertText',
@@ -80,19 +93,22 @@ const generateInputSteps = (coordinates, text) => {
   return result;
 };
 const generateSearchButtonSteps = coordinates => {
+  const coords = convertVecToPx(coordinates);
   return [
     {
       action: 'showBoundingBox',
-      params: {
-        top: '259px',
-        left: '1056px',
-        width: '120px',
-        height: '30px',
-      },
+      params: coords,
+      //   params: {
+      //     top: '259px',
+      //     left: '1056px',
+      //     width: '120px',
+      //     height: '30px',
+      //   },
     },
     {
       action: 'mouse.click',
-      params: [1056 + 10, 259 + 5],
+      params: [coords.centroid.x, coords.centroid.y],
+      //   params: [1056 + 10, 259 + 5],
     },
   ];
 };
@@ -103,11 +119,11 @@ const finalSteps = [
   },
 ];
 const run = async (setupSteps, typeInSearch, finalSteps) => {
-  const objectLocalizer = new ObjectLocalization()
+  const objectLocalizer = new ObjectLocalization();
   const browser = await chromium.launchPersistentContext('', {
     headless: false,
     slowMo: 500,
-    viewport: { width: 1440, height: 785 },
+    viewport: { width: viewportWidth, height: viewportHeight },
   });
   const page = await browser.newPage();
   const imagePath = `./images/${uuid.v4()}.png`;
@@ -115,10 +131,21 @@ const run = async (setupSteps, typeInSearch, finalSteps) => {
     await _.invoke(page, setupStep.action, ...setupStep.params);
   }
 
-  const prediction = await objectLocalizer.predict(imagePath)
+  const prediction = await objectLocalizer.predict(imagePath);
+  const searchInputBox = prediction.find(
+    result => result.displayName === 'search_input_box',
+  );
+  const searchButton = prediction.find(
+    result => result.displayName === 'search_button',
+  );
 
-  const inputSteps = generateInputSteps([], typeInSearch);
-  const buttonSteps = generateSearchButtonSteps([]);
+  const inputSteps = generateInputSteps(
+    searchInputBox.normalizedVertices,
+    typeInSearch,
+  );
+  const buttonSteps = generateSearchButtonSteps(
+    searchButton.normalizedVertices,
+  );
   const steps = [...inputSteps, ...buttonSteps, finalSteps];
 
   for await (const step of steps) {
