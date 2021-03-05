@@ -1,40 +1,69 @@
 const { chromium } = require('playwright');
 const _ = require('lodash');
-const gotoWebsite = {
-  action: 'goto',
-  params: ['https://elines.coscoshipping.com/ebusiness/cargoTracking'],
-};
-const steps = [
+const uuid = require('uuid');
+
+const setupSteps = (imagePath: string) => [
+  {
+    action: 'goto',
+    params: ['https://elines.coscoshipping.com/ebusiness/cargoTracking'],
+  },
   {
     action: 'click',
     params: ['button:has-text("OK")'],
   },
   {
+    action: 'screenshot',
+    params: [{ path: imagePath }],
+  },
+];
+const steps = [
+  {
     action: 'showBoundingBox',
     params: {
       top: '259px',
-      left: '239px',
+      left: '416px',
+      width: '160px',
+      height: '30px',
+    },
+  },
+  {
+    action: 'mouse.click',
+    params: [416 + 10, 259 + 5],
+  },
+  {
+    action: 'keyboard.insertText',
+    params: ['something'],
+  },
+  {
+    action: 'showBoundingBox',
+    params: {
+      top: '259px',
+      left: '1056px',
       width: '120px',
       height: '30px',
     },
   },
   {
     action: 'mouse.click',
-    params: [239 + 10, 259 + 5],
+    params: [1056 + 10, 259 + 5],
   },
   {
     action: 'pause',
     params: [],
   },
 ];
-const run = async (gotoWebsite, steps) => {
+const run = async (setupSteps, steps) => {
   const browser = await chromium.launchPersistentContext('', {
     headless: false,
     slowMo: 500,
     viewport: { width: 1440, height: 785 },
   });
   const page = await browser.newPage();
-  await _.invoke(page, gotoWebsite.action, ...gotoWebsite.params);
+  const imagePath = `./images/${uuid.v4()}.png`;
+  for await (const setupStep of setupSteps(imagePath)) {
+    await _.invoke(page, setupStep.action, ...setupStep.params);
+  }
+
   for await (const step of steps) {
     console.log(step);
     if (step.action === 'showBoundingBox') {
@@ -66,7 +95,7 @@ const run = async (gotoWebsite, steps) => {
   // await handle.dispose();
   await browser.close();
 };
-run(gotoWebsite, steps);
+run(setupSteps, steps);
 const cosco = async () => {
   const browser = await chromium.launchPersistentContext('', {
     headless: false,
