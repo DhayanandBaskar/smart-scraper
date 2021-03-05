@@ -51,8 +51,8 @@ const convertVecToPx = normalizedVertices => {
     normalizedVertices[1].x * viewportWidth -
     normalizedVertices[0].x * viewportWidth;
   const height =
-    normalizedVertices[1].x * viewportHeight -
-    normalizedVertices[0].x * viewportHeight;
+    normalizedVertices[1].y * viewportHeight -
+    normalizedVertices[0].y * viewportHeight;
   const centroid = {
     x: left + width / 2,
     y: top + height / 2,
@@ -122,7 +122,7 @@ const run = async (setupSteps, typeInSearch, finalSteps) => {
   const objectLocalizer = new ObjectLocalization();
   const browser = await chromium.launchPersistentContext('', {
     headless: false,
-    slowMo: 500,
+    slowMo: 1500,
     viewport: { width: viewportWidth, height: viewportHeight },
   });
   const page = await browser.newPage();
@@ -140,11 +140,11 @@ const run = async (setupSteps, typeInSearch, finalSteps) => {
   );
 
   const inputSteps = generateInputSteps(
-    searchInputBox.normalizedVertices,
+    searchInputBox.imageObjectDetection.boundingBox.normalizedVertices,
     typeInSearch,
   );
   const buttonSteps = generateSearchButtonSteps(
-    searchButton.normalizedVertices,
+    searchButton.imageObjectDetection.boundingBox.normalizedVertices,
   );
   const steps = [...inputSteps, ...buttonSteps, finalSteps];
 
@@ -179,42 +179,13 @@ const run = async (setupSteps, typeInSearch, finalSteps) => {
   // await handle.dispose();
   await browser.close();
 };
-// run(setupStepsCosco, 'cosco', finalSteps);
-const oneyBlNo = 'NK0GF9561700';
-// run(setupStepsOney, oneyBlNo, finalSteps);
-run(setupStepsOther, 'a search term', finalSteps);
-const cosco = async () => {
-  const browser = await chromium.launchPersistentContext('', {
-    headless: false,
-    slowMo: 1000,
-    viewport: { width: 1440, height: 785 },
-  });
-  const page = await browser.newPage();
-  await page.goto('https://elines.coscoshipping.com/ebusiness/cargoTracking');
-  await page.click('button:has-text("OK")');
-  // await page.pause();
-  // await page.click("text=Bill Of Lading");
-  // await page.click("text=Booking");
-  // await page.mouse.move(239 + 10, 259 + 5);
-  await page.mouse.click(239 + 10, 259 + 5);
-  await page.pause();
-  // await page.click(button);
-  // await page.goto("http://whatsmyuseragent.org/");
-  // await page.screenshot({ path: `example.png` });
-  await browser.close();
-};
-// cosco();
-const ss = async () => {
-  const browser = await chromium.launchPersistentContext('', {
-    headless: false,
-    slowMo: 1000,
-    viewport: { width: 1440, height: 785 },
-  });
-  const page = await browser.newPage();
 
-  await page.goto('http://google.com');
-  await page.click('button:has-text("I agree")');
-  await page.screenshot({ path: `example.png` });
-  await browser.close();
-};
-// ss();
+const main = async () => {
+  // run(setupStepsCosco, 'cosco', finalSteps);
+  const oneyBlNo = 'NK0GF9561700';
+  await run(setupStepsOney, oneyBlNo, finalSteps);
+  await run(setupStepsOther, 'a search term', finalSteps);
+}
+
+main()
+
