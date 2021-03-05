@@ -2,7 +2,31 @@ const { chromium } = require('playwright');
 const _ = require('lodash');
 const uuid = require('uuid');
 
-const setupSteps = (imagePath: string) => [
+const setupStepsOther = (imagePath: string) => [
+  {
+    action: 'goto',
+    params: ['https://yahoo.com'],
+  },
+  {
+    action: 'click',
+    params: ['button:has-text("Ich stimme zu.")'],
+  },
+  {
+    action: 'screenshot',
+    params: [{ path: imagePath }],
+  },
+];
+const setupStepsOney = (imagePath: string) => [
+  {
+    action: 'goto',
+    params: ['https://ecomm.one-line.com/ecom/CUP_HOM_3301.do'],
+  },
+  {
+    action: 'screenshot',
+    params: [{ path: imagePath }],
+  },
+];
+const setupStepsCosco = (imagePath: string) => [
   {
     action: 'goto',
     params: ['https://elines.coscoshipping.com/ebusiness/cargoTracking'],
@@ -16,43 +40,66 @@ const setupSteps = (imagePath: string) => [
     params: [{ path: imagePath }],
   },
 ];
-const steps = [
-  {
-    action: 'showBoundingBox',
-    params: {
-      top: '259px',
-      left: '416px',
-      width: '160px',
-      height: '30px',
+const convertVecToPx = coordinates => {
+  const top = coordinates[0];
+  const left = coordinates[1];
+  const width = coordinates[2];
+  const height = coordinates[3];
+
+  return {
+    top: `${top}px`,
+    left: `${left}px`,
+    width: `${width}px`,
+    height: `${height}px`,
+  };
+};
+// label: 'search_input_box',
+const generateInputSteps = (coordinates, text) => {
+  const result = [
+    {
+      action: 'showBoundingBox',
+      params: {
+        top: '259px',
+        left: '416px',
+        width: '160px',
+        height: '30px',
+      },
     },
-  },
-  {
-    action: 'mouse.click',
-    params: [416 + 10, 259 + 5],
-  },
-  {
-    action: 'keyboard.insertText',
-    params: ['something'],
-  },
-  {
-    action: 'showBoundingBox',
-    params: {
-      top: '259px',
-      left: '1056px',
-      width: '120px',
-      height: '30px',
+    {
+      action: 'mouse.click',
+      params: [416 + 10, 259 + 5],
     },
-  },
-  {
-    action: 'mouse.click',
-    params: [1056 + 10, 259 + 5],
-  },
+    {
+      action: 'keyboard.insertText',
+      params: [text],
+    },
+  ];
+  return result;
+};
+const generateSearchButtonSteps = coordinates => {
+  return [
+    {
+      action: 'showBoundingBox',
+      params: {
+        top: '259px',
+        left: '1056px',
+        width: '120px',
+        height: '30px',
+      },
+    },
+    {
+      action: 'mouse.click',
+      params: [1056 + 10, 259 + 5],
+    },
+  ];
+};
+const finalSteps = [
   {
     action: 'pause',
     params: [],
   },
 ];
-const run = async (setupSteps, steps) => {
+const run = async (setupSteps, typeInSearch, finalSteps) => {
   const browser = await chromium.launchPersistentContext('', {
     headless: false,
     slowMo: 500,
@@ -63,6 +110,10 @@ const run = async (setupSteps, steps) => {
   for await (const setupStep of setupSteps(imagePath)) {
     await _.invoke(page, setupStep.action, ...setupStep.params);
   }
+
+  const inputSteps = generateInputSteps([], typeInSearch);
+  const buttonSteps = generateSearchButtonSteps([]);
+  const steps = [...inputSteps, ...buttonSteps, finalSteps];
 
   for await (const step of steps) {
     console.log(step);
@@ -95,7 +146,10 @@ const run = async (setupSteps, steps) => {
   // await handle.dispose();
   await browser.close();
 };
-run(setupSteps, steps);
+// run(setupStepsCosco, 'cosco', finalSteps);
+const oneyBlNo = 'NK0GF9561700';
+// run(setupStepsOney, oneyBlNo, finalSteps);
+run(setupStepsOther, 'a search term', finalSteps);
 const cosco = async () => {
   const browser = await chromium.launchPersistentContext('', {
     headless: false,
