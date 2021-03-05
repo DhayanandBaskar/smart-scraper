@@ -1,14 +1,22 @@
 const { chromium } = require('playwright');
 const _ = require('lodash');
-const gotoWebsite = {
-  action: 'goto',
-  params: ['https://elines.coscoshipping.com/ebusiness/cargoTracking'],
-};
-const steps = [
+const uuid = require('uuid');
+
+const setupSteps = (imagePath: string) => [
+  {
+    action: 'goto',
+    params: ['https://elines.coscoshipping.com/ebusiness/cargoTracking'],
+  },
   {
     action: 'click',
     params: ['button:has-text("OK")'],
   },
+  {
+    action: 'screenshot',
+    params: [{ path: imagePath }],
+  },
+];
+const steps = [
   {
     action: 'showBoundingBox',
     params: {
@@ -27,14 +35,18 @@ const steps = [
     params: [],
   },
 ];
-const run = async (gotoWebsite, steps) => {
+const run = async (setupSteps, steps) => {
   const browser = await chromium.launchPersistentContext('', {
     headless: false,
     slowMo: 500,
     viewport: { width: 1440, height: 785 },
   });
   const page = await browser.newPage();
-  await _.invoke(page, gotoWebsite.action, ...gotoWebsite.params);
+  const imagePath = `./images/${uuid.v4()}.png`;
+  for await (const setupStep of setupSteps(imagePath)) {
+    await _.invoke(page, setupStep.action, ...setupStep.params);
+  }
+
   for await (const step of steps) {
     console.log(step);
     if (step.action === 'showBoundingBox') {
@@ -66,7 +78,7 @@ const run = async (gotoWebsite, steps) => {
   // await handle.dispose();
   await browser.close();
 };
-run(gotoWebsite, steps);
+run(setupSteps, steps);
 const cosco = async () => {
   const browser = await chromium.launchPersistentContext('', {
     headless: false,
