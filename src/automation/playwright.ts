@@ -30,6 +30,18 @@ const setupStepsOney = (imagePath: string) => [
     params: [{ path: imagePath }],
   },
 ];
+
+const setupGenericSteps = (url: string) => (imagePath: string) => [
+  {
+    action: 'goto',
+    params: [url],
+  },
+  {
+    action: 'screenshot',
+    params: [{ path: imagePath }],
+  },
+];
+
 const setupStepsCosco = (imagePath: string) => [
   {
     action: 'goto',
@@ -93,6 +105,14 @@ const generateInputSteps = (coordinates, text) => {
   return result;
 };
 const generateSearchButtonSteps = coordinates => {
+  if(!coordinates) {
+    return [
+      {
+        action: "keyboard.press",
+        params: ["Enter"]
+      }
+    ]
+  }
   const coords = convertVecToPx(coordinates);
   return [
     {
@@ -144,7 +164,7 @@ const run = async (setupSteps, typeInSearch, finalSteps) => {
     typeInSearch,
   );
   const buttonSteps = generateSearchButtonSteps(
-    searchButton.imageObjectDetection.boundingBox.normalizedVertices,
+    searchButton?.imageObjectDetection?.boundingBox?.normalizedVertices,
   );
   const steps = [...inputSteps, ...buttonSteps, ...finalSteps];
 
@@ -181,7 +201,8 @@ const run = async (setupSteps, typeInSearch, finalSteps) => {
 };
 
 const main = async () => {
-  await run(setupStepsCosco, 'cosco', finalSteps);
+  await run(setupGenericSteps('https://duckduckgo.com/'), 'anon search', finalSteps);
+  await run(setupStepsCosco, 'COSU6293350130', finalSteps);
   const oneyBlNo = 'NK0GF9561700';
   await run(setupStepsOney, oneyBlNo, finalSteps);
   await run(setupStepsOther, 'a search term', finalSteps);
