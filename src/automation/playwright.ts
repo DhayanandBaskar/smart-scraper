@@ -21,14 +21,31 @@ const steps = [
     action: 'showBoundingBox',
     params: {
       top: '259px',
-      left: '239px',
+      left: '416px',
+      width: '160px',
+      height: '30px',
+    },
+  },
+  {
+    action: 'mouse.click',
+    params: [416 + 10, 259 + 5],
+  },
+  {
+    action: 'keyboard.insertText',
+    params: ['something'],
+  },
+  {
+    action: 'showBoundingBox',
+    params: {
+      top: '259px',
+      left: '1056px',
       width: '120px',
       height: '30px',
     },
   },
   {
     action: 'mouse.click',
-    params: [239 + 10, 259 + 5],
+    params: [1056 + 10, 259 + 5],
   },
   {
     action: 'pause',
