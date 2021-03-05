@@ -1,6 +1,9 @@
+import { ObjectLocalization } from '../ObjectLocalization';
+
 const { chromium } = require('playwright');
 const _ = require('lodash');
 const uuid = require('uuid');
+
 
 const setupStepsOther = (imagePath: string) => [
   {
@@ -100,6 +103,7 @@ const finalSteps = [
   },
 ];
 const run = async (setupSteps, typeInSearch, finalSteps) => {
+  const objectLocalizer = new ObjectLocalization()
   const browser = await chromium.launchPersistentContext('', {
     headless: false,
     slowMo: 500,
@@ -110,6 +114,8 @@ const run = async (setupSteps, typeInSearch, finalSteps) => {
   for await (const setupStep of setupSteps(imagePath)) {
     await _.invoke(page, setupStep.action, ...setupStep.params);
   }
+
+  const prediction = await objectLocalizer.predict(imagePath)
 
   const inputSteps = generateInputSteps([], typeInSearch);
   const buttonSteps = generateSearchButtonSteps([]);
