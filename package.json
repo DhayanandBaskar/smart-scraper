@@ -22,15 +22,15 @@
     "automate": "ts-node src/automation/playwright.ts"
   },
   "dependencies": {
-    "@types/lodash": "^4.14.168",
-    "lodash": "^4.17.21",
-    "playwright": "^1.9.1",
     "@google-cloud/automl": "^2.2.0",
     "@google-cloud/vision": "^2.1.1",
     "@nestjs/common": "^7.0.0",
     "@nestjs/core": "^7.0.0",
     "@nestjs/platform-express": "^7.0.0",
+    "@types/lodash": "^4.14.168",
     "graceful-fs": "^4.2.4",
+    "lodash": "^4.17.21",
+    "playwright": "^1.9.1",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^6.5.4",
